@@ -4,39 +4,97 @@
 template <class T>
 class SkipList{
     private:
-        uint32 promotion_prob;
+        static const float kPROMOTION_PROB = 0.5;
+        static const uint32 kMAX_LAYERS = 6;
         uint32 num_layers;
+        uint32 size;
         Node* head;
-        class Node{
-            private:
-                T element;
-                Node* next[num_layers];
-                Node* previous[num_layers];
+        struct Node{
+            T element;
+            Node* next[num_layers];
+            Node* previous[num_layers];
         };
+        Node* make_node(const uint32 level, const T& value) const{
+            Node* node = new Node;
+            node->element = value;
+        }
     public:
         // ctors
-        SkipList();
-        SkipList(uint32 count, const T& value = T());
-        SkipList(uint32 count, const T& value);
+        SkipList() : num_layers(0), size(0){
+            head = make_node(kMAX_LAYERS, 0);
+        }
+        SkipList(uint32 count, const T& value = T()){
+            SkipList;
+            for(uint32 i = 0; i < count; ++i){
+                push_back(value);
+            }
+        }
+        SkipList(uint32 count, const T& value){
+            SkipList(count, value);
+        }
         template <class InputIt>
-        SkipList(InputIt first, InputIt, last);
-        SkipList(const SkipList& other);
-        SkipList(const SkipList&& other);
-        SkipList(std::initilizer_list<T> ilist);
+        SkipList(InputIt first, InputIt last){
+            SkipList;
+            for(auto it = first; it != last; ++it){
+                push_back(*it);
+            }
+        }
+        SkipList(const SkipList& other) : size(other.size()), num_layers(other.num_layers) {
+            if(!other.empty()){
+                Node* other_ptr = other.head;
+                Node* ptr = new Node{other_ptr->element, nullptr, nullptr};
+                head = ptr;
+                while(other_ptr->next[0]){
+                    other_ptr = other_ptr->next[0];
+                    Node* next = new Node{other_ptr->element, ptr, nullptr};
+                    ptr->next[0] = next;
+                    ptr = ptr->next[0]
+                }
+        }
+        SkipList(const SkipList&& other){
+            //TODO
+        }
+        SkipList(std::initilizer_list<T> ilist){
+            //TODO
+        }
 
         // dtor
-        ~SkipList();
+        ~SkipList(){
+            //TODO
+        }
 
         // assignment operators
-        SkipList& operator=(const SkipList& other);
-        SkipList& operator=(const SkipList&& other);
-        SkipList& operator=(std::initilizer_list<T> ilist);
+        SkipList& operator=(const SkipList& other){
+            swap(other);
+        }
+        SkipList& operator=(const SkipList&& other){
+            //TODO
+        }
+        SkipList& operator=(std::initilizer_list<T> ilist){
+            //TODO
+        }
 
         // element access
-        T& front();
-        const T& front() const;
-        T& back();
-        const T& back() const;
+        T& front(){
+            return head->element;
+        }
+        const T& front() const{
+            return head->element;
+        }
+        T& back(){
+            Node* ptr = head;
+            while(ptr->next[0]){
+                ptr = ptr->next[0];
+            }
+            return ptr->element;
+        }
+        const T& back() const{
+            Node* ptr = head;
+            while(ptr->next[0]){
+                ptr = ptr->next[0];
+            }
+            return ptr->element;
+        }
 
         // iterators
         SkipList::iterator begin();
@@ -53,9 +111,15 @@ class SkipList{
         SkipList::const_reverse_iterator crend() const;
 
         // capacity
-        bool empty() const;
-        size_t size() const;
-        size_t max_size() const;
+        bool empty() const{
+            return size == 0;
+        }
+        size_t size() const{
+            return size;
+        }
+        size_t max_size() const{
+            //TODO
+        }
 
         // modifiers
         void clear();
