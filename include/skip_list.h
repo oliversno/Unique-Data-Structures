@@ -187,9 +187,40 @@ class SkipList{
         template <class... Args>
         std::pair<SkipList::iterator, bool> emplace(SkipList::const_iterator pos, Args&&... args);
         SkipList::iterator emplace(SkipList::const_iterator pos, Args&&... args);
-        size_t erase(const T& value);
+        size_t erase(const T& value){
+            Node* cur_ptr = head;
+            // create an array to store changes on each layer
+            Node* update[kMAX_LAYERS+1];
+            memset(update, 0, sizeof(Node*)*(kMAX_LAYERS+1));
+            for(int i = num_layers; i >= 0; --i){
+                while(cur_ptr->forward[i] && cur_ptr->forward[i]->element < value){
+                    cur_ptr = cur_ptr->forward[i];
+                }
+                update[i] = cur_ptr;
+            }
+            cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
+            if(cur_ptr && cur_ptr->element == value){
+                for(int i = 0; i <= num_layers; ++i){
+                    if(update[i]->forward[i] != cur_ptr)
+                        break;
+                    update[i]->forward[i] = cur_ptr->forward[i];
+                }
+                delete cur_ptr;
+                while(num_layers > 0 && !head->forawrd[num_layers]){
+                    --num_layers;
+                }
+                --size;
+            }
+            return size;
+        }
         SkipList::iterator erase(SkipList::const_iterator pos);
-        SkipList::iterator erase(SkipList::const_iterator first, SkipList::const_iterator last);
+        SkipList::iterator erase(SkipList::const_iterator first, SkipList::const_iterator last){
+            auto it = last;
+            while(it != first){
+                auto res = erase(it--);
+            }
+            return res;
+        }
         void swap(SkipList& other);
 
         // operations
