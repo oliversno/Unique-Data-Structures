@@ -5,15 +5,15 @@ template <class T>
 class SkipList{
     private:
         static const float kPROMOTION_PROB = 0.5;
-        static const uint32 kMAX_LAYERS = 6;
-        uint32 num_layers;
-        uint32 size;
+        static const unsigned int kMAX_LAYERS = 6;
+        unsigned int num_layers;
+        unsigned int size;
         Node* head;
         struct Node{
             T element;
             Node* forward[num_layers];
         };
-        Node* make_node(const uint32 level, const T& value) const{
+        Node* make_node(const unsigned int level, const T& value) const{
             Node* node = new Node;
             node->element = value;
         }
@@ -22,18 +22,18 @@ class SkipList{
         SkipList() : num_layers(0), size(0){
             head = make_node(kMAX_LAYERS, 0);
         }
-        SkipList(uint32 count, const T& value = T()){
-            SkipList;
-            for(uint32 i = 0; i < count; ++i){
+        SkipList(unsigned int count, const T& value = T()){
+            this = new SkipList;
+            for(unsigned int i = 0; i < count; ++i){
                 push_back(value);
             }
         }
-        SkipList(uint32 count, const T& value){
+        SkipList(unsigned int count, const T& value){
             SkipList(count, value);
         }
         template <class InputIt>
         SkipList(InputIt first, InputIt last){
-            SkipList;
+            this = new SkipList;
             for(auto it = first; it != last; ++it){
                 push_back(*it);
             }
@@ -53,7 +53,7 @@ class SkipList{
         SkipList(const SkipList&& other){
             //TODO
         }
-        SkipList(std::initilizer_list<T> ilist){
+        SkipList(std::initilizer_list<T> ilist) : size(0), num_layers(0){
             auto it = ilist.begin();
             while(it != ilist.end()){
                 insert(*it);
@@ -124,7 +124,8 @@ class SkipList{
             return size;
         }
         size_t max_size() const{
-            //TODO
+            unsigned int arch_bit = sizeof(void*)*8;
+            return std::pow(2, arch_bit)/sizeof(T) - 1;
         }
 
         // modifiers
@@ -145,7 +146,7 @@ class SkipList{
             }
             cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
             if(!cur_ptr || cur_ptr->element != value){
-                uint32 rand_layer = randomlevel();
+                unsigned int rand_layer = randomlevel();
                 if(rand_layer > num_layers){
                     for(int i = num_layers+1; i < rand_layer+1; ++i){
                         update[i] = head;
@@ -158,6 +159,7 @@ class SkipList{
                     new_node->forward[i] = update[i]->forward[i];
                     update[i]->forward[i] = new_node;
                 }
+                ++size;
                 return std::make_pair(//new_node as it, true);
             }
             return std::make_pair(end(), false);
