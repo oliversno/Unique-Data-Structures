@@ -11,8 +11,7 @@ class SkipList{
         Node* head;
         struct Node{
             T element;
-            Node* next[num_layers];
-            Node* previous[num_layers];
+            Node* forward[num_layers];
         };
         Node* make_node(const uint32 level, const T& value) const{
             Node* node = new Node;
@@ -44,11 +43,11 @@ class SkipList{
                 Node* other_ptr = other.head;
                 Node* ptr = new Node{other_ptr->element, nullptr, nullptr};
                 head = ptr;
-                while(other_ptr->next[0]){
-                    other_ptr = other_ptr->next[0];
-                    Node* next = new Node{other_ptr->element, ptr, nullptr};
-                    ptr->next[0] = next;
-                    ptr = ptr->next[0]
+                while(other_ptr->forward[0]){
+                    other_ptr = other_ptr->forward[0];
+                    Node* forward = new Node{other_ptr->element, ptr, nullptr};
+                    ptr->forward[0] = forward;
+                    ptr = ptr->forward[0]
                 }
         }
         SkipList(const SkipList&& other){
@@ -83,15 +82,15 @@ class SkipList{
         }
         T& back(){
             Node* ptr = head;
-            while(ptr->next[0]){
-                ptr = ptr->next[0];
+            while(ptr->forward[0]){
+                ptr = ptr->forward[0];
             }
             return ptr->element;
         }
         const T& back() const{
             Node* ptr = head;
-            while(ptr->next[0]){
-                ptr = ptr->next[0];
+            while(ptr->forward[0]){
+                ptr = ptr->forward[0];
             }
             return ptr->element;
         }
@@ -123,35 +122,57 @@ class SkipList{
 
         // modifiers
         void clear();
-        SkipList::iterator insert(SkipList::iterator pos, const T& value);
+        std::pair<SkipList::iterator, bool> insert(const T& value){
+            Node* cur_ptr = head;
+            // create an array to store changes on each layer
+            Node* update[kMAX_LAYERS+1];
+            memset(update, 0, sizeof(Node*)*(kMAX_LAYERS+1));
+            //travel down layers and advance cur_ptr until right spot is found
+            for(int i = num_layers; i >= 0; --i){
+                while(cur_ptr->forward[i] && cur_ptr->forward[i]->element < value){
+                    cur_ptr = cur_ptr->forward[i];
+                }
+                update[i] = cur_ptr;
+            }
+            cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
+            if(!cur_ptr || cur_ptr->element != value){
+                uint32 rand_layer = randomlevel();
+                if(rand_layer > num_layers){
+                    for(int i = num_layers+1; i < rand_layer+1; ++i){
+                        update[i] = head;
+                    }
+                    num_layers = rand_layer
+                }
+                Node* new_node = new Node;
+                new_node->element = value;
+                for(int i = 0; i <= rand_layer; ++i){
+                    new_node->forward[i] = update[i]->forward[i];
+                    update[i]->forward[i] = new_node;
+                }
+                return std::make_pair(//new_node as it, true);
+            }
+            return std::make_pair(end(), false);
+        }
+        std::pair<SkipList::iterator, bool> insert(T&& value);
         SkipList::iterator insert(SkipList::const_iterator pos, const T& value);
-        SkipList::iterator insert(SkipList::const_iterator pos, T&& value);
-        void insert(SkipList::iterator pos, size_t count, const T& value);
+        SkipList::iterator insert(SkipList::const_iterator pos, T&& value){
+            //use pos as hint
+        }
         SkipList::iterator insert(SkipList::const_iterator pos, size_t count, const T& value);
         template <class InputIt);
-        void insert(SkipList::iterator pos, InputIt first, InputIt last);
-        SkipList::iterator insert(SkipList::const_iterator pos, InputIt first, InputIt last);
-        SkipList::iterator insert(SkipList::const_iterator pos, std::initilizer_list<T> ilist);
+        void insert(SkipList::iterator pos, InputIt first, InputIt last){
+            while(first != last){
+                insert(pos++, value);
+                ++first;
+            }
+        }
+        void insert(std::initilizer_list<T> ilist);
         template <class... Args>
+        std::pair<SkipList::iterator, bool> emplace(SkipList::const_iterator pos, Args&&... args);
         SkipList::iterator emplace(SkipList::const_iterator pos, Args&&... args);
-        SkipList::iterator erase(SkipList::iterator pos);
+        size_t erase(const T& value);
         SkipList::iterator erase(SkipList::const_iterator pos);
-        SkipList::iterator erase(SkipList::iterator first, SkipList::iterator last);
         SkipList::iterator erase(SkipList::const_iterator first, SkipList::const_iterator last);
-        void push_back(const T& value);
-        void push_back(T&& value);
-        template <class... Args>
-        void emplace_back(Args&&... args);
-        template <class... Args>
-        T& emplace_back(Args&&... args);
-        void pop_back();
-        void push_front(const T& value);
-        void push_front(T&& value);
-        template <class... Args>
-        void emplace_front(Args&&... args);
-        template <class... Args>
-        T& emplace_front(Args&&... args);
-        void pop_front();
         void resize(size_t count, T value = T());
         void resize(size_t count);
         void resize(size_t count, const &T value);
