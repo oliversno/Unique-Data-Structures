@@ -244,23 +244,61 @@ class SkipList{
 };
 
 template <class T>
-bool operator==(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator==(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    if(lhs.size() != rhs.size()){return false; }
+    auto lhs_it = lhs.begin();
+    auto rhs_it = rhs.begin();
+    while(lhs_it != lhs.end()){
+        if(*lhs_it++ != *rhs_it++)
+            return false;
+    }
+    return true;
+}
 template <class T>
-bool operator!=(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator!=(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    return !(lhs == rhs);
+}
 template <class T>
-bool operator<=(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator<=(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    return !(rhs<lhs);
+}
 template <class T>
-bool operator<(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator<(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    return std::lexicographical_compare(lhs.begin(), lhs.end()
+                                        rhs.begin(), rhs.end());
+}
 template <class T>
-bool operator>=(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator>=(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    return !(lhs<rhs);
+}
 template <class T>
-bool operator>(const SkipList<T>& lhs, const SkipList<T>& rhs);
+bool operator>(const SkipList<T>& lhs, const SkipList<T>& rhs){
+    return rhs<lhs;
+}
 
 template <class T>
 void swap(SkipList<T>& lhs, SkipList<T>& rhs);
 template <class T, class U>
-void erase(SkipList<T>& c, const U& value);
+void erase(SkipList<T>& c, const U& value){
+        for(auto it = c.begin(), last = c.end(); it != last){
+        if(*it == U){
+            it = c.erase(it);
+        }
+        else{
+            ++it;
+        }
+    }
+}
 template <class T, class Pred>
-void erase_if(SkipList<T>& c, Pred pred);
+void erase_if(SkipList<T>& c, Pred pred){
+    for(auto it = c.begin(), last = c.end(); it != last){
+        if(pred(*it)){
+            it = c.erase(it);
+        }
+        else{
+            ++it;
+        }
+    }
+}
 
 #endif
