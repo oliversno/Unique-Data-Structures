@@ -54,7 +54,11 @@ class SkipList{
             //TODO
         }
         SkipList(std::initilizer_list<T> ilist){
-            //TODO
+            auto it = ilist.begin();
+            while(it != ilist.end()){
+                insert(*it);
+                ++it;
+            }
         }
 
         // dtor
@@ -65,12 +69,15 @@ class SkipList{
         // assignment operators
         SkipList& operator=(const SkipList& other){
             swap(other);
+            return *this;
         }
         SkipList& operator=(const SkipList&& other){
             //TODO
         }
         SkipList& operator=(std::initilizer_list<T> ilist){
-            //TODO
+            clear();
+            *this = new SkipList(ilist);
+            return *this;
         }
 
         // element access
@@ -121,7 +128,9 @@ class SkipList{
         }
 
         // modifiers
-        void clear();
+        void clear(){
+            erase(this->begin(), this->end());
+        }
         std::pair<SkipList::iterator, bool> insert(const T& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
@@ -166,16 +175,19 @@ class SkipList{
                 ++first;
             }
         }
-        void insert(std::initilizer_list<T> ilist);
+        void insert(std::initilizer_list<T> ilist){
+            auto it = ilist.begin();
+            while(it != ilist.end()){
+                insert(*it);
+                ++it;
+            }
+        }
         template <class... Args>
         std::pair<SkipList::iterator, bool> emplace(SkipList::const_iterator pos, Args&&... args);
         SkipList::iterator emplace(SkipList::const_iterator pos, Args&&... args);
         size_t erase(const T& value);
         SkipList::iterator erase(SkipList::const_iterator pos);
         SkipList::iterator erase(SkipList::const_iterator first, SkipList::const_iterator last);
-        void resize(size_t count, T value = T());
-        void resize(size_t count);
-        void resize(size_t count, const &T value);
         void swap(SkipList& other);
 
         // operations
@@ -196,16 +208,6 @@ class SkipList{
         void remove_if(UnaryPred p);
         template <class UnaryPred>
         size_t remove_if(UnaryPred p);
-        void reverse();
-        void unique();
-        size_t unique();
-        template <class BinaryPred>
-        void unique(BinaryPred p);
-        template <class BinaryPred>
-        size_t unique(BinaryPred p);
-        void sort();
-        template <class Compare>
-        void sort(Compare comp);
 };
 
 template <class T>
