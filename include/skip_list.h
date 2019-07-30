@@ -22,14 +22,11 @@ class SkipList{
         SkipList() : num_layers(0), size(0){
             head = make_node(kMAX_LAYERS, 0);
         }
-        SkipList(unsigned int count, const T& value = T()){
+        SkipList(unsigned int count, const T& value){
             this = new SkipList;
             for(unsigned int i = 0; i < count; ++i){
                 push_back(value);
             }
-        }
-        SkipList(unsigned int count, const T& value){
-            SkipList(count, value);
         }
         template <class InputIt>
         SkipList(InputIt first, InputIt last){
