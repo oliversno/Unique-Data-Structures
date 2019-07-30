@@ -41,3 +41,10 @@ TEST(SkipListTests, ilistCtor){
     EXPECT_EQ(test.erase("three"), 0);
     EXPECT_TRUE(test.empty());
 }
+
+TEST(SkipListTests, dtor){
+    SkipList<int>* ptr = new SkipList<int>;
+    delete ptr;
+    SUCCEED();
+}
+
