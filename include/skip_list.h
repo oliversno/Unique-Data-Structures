@@ -236,11 +236,32 @@ class SkipList{
         void splice(SkipList::const_iterator pos, SkipList&& other, SkipList::const_iterator it);
         void splice(SkipList::const_iterator pos, SkipList& other, SkipList::const_iterator first, SkipList::const_iterator last);
         void splice(SkipList::const_iterator pos, SkipList&& other, SkipList::const_iterator first, SkipList::const_iterator last);
-        void remove(const T& value);
+        void remove(const T& value){
+            for(auto it = this->begin(), last = this->end(); it != last){
+                if(*it == U){
+                    it = this->erase(it);
+                }
+                else{
+                    ++it;
+                }
+            }
+        }
         template <class UnaryPred>
-        void remove_if(UnaryPred p);
+        void remove_if(UnaryPred p){
+            for(auto it = this->begin(), last = this->end(); it != last){
+                if(pred(*it)){
+                    it = erase(it);
+                }
+                else{
+                    ++it;
+                }
+            }
+        }
         template <class UnaryPred>
-        size_t remove_if(UnaryPred p);
+        size_t remove_if(UnaryPred p){
+            remove_if(p);
+            return size;
+        }
 };
 
 template <class T>
@@ -277,28 +298,18 @@ bool operator>(const SkipList<T>& lhs, const SkipList<T>& rhs){
 }
 
 template <class T>
-void swap(SkipList<T>& lhs, SkipList<T>& rhs);
+void swap(SkipList<T>& lhs, SkipList<T>& rhs){
+    SkipList temp{lhs};
+    lhs = rhs;
+    rhs = temp;
+}
 template <class T, class U>
 void erase(SkipList<T>& c, const U& value){
-        for(auto it = c.begin(), last = c.end(); it != last){
-        if(*it == U){
-            it = c.erase(it);
-        }
-        else{
-            ++it;
-        }
-    }
+    c.remove(value);
 }
 template <class T, class Pred>
 void erase_if(SkipList<T>& c, Pred pred){
-    for(auto it = c.begin(), last = c.end(); it != last){
-        if(pred(*it)){
-            it = c.erase(it);
-        }
-        else{
-            ++it;
-        }
-    }
+    c.remove_if(pred);
 }
 
 #endif
