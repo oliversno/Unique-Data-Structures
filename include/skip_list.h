@@ -220,6 +220,46 @@ class SkipList{
         }
         void swap(SkipList& other);
 
+        // lookup
+        size_t count(const T& value) const{
+            auto pair = equal_range(value);
+            return std::distence(pair.second - pair.first);
+        }
+        SkipList::iterator find(const T& value){
+            Node* cur_ptr = head;
+            for(int i = num_layers; i >= 0; --i){
+                while(cur_ptr->forward[i] && cur_ptr->element < value){
+                    if(cur_ptr->element == value)
+                        return //ptr to iterator
+                    cur_ptr = cur_ptr->forward[i];
+                }
+            }
+            return this->end();
+        }
+        SkipList::const_iterator find(const T& value) const;
+        bool contains(const T& value) const{
+            return find(value) != this->end();
+        }
+        std::pair<SkipList::iterator, SkipList::iterator> equal_range(const T& value){
+            auto start_it = find(value);
+            Node* cur_ptr = start_it;
+            for(int i = num_layers; i >= 0; --i){
+                while(cur_ptr-forward[i] && cur_ptr->element <= value){
+                    cur_ptr = cur_ptr->forward[i];
+                }
+            }
+            SkipList::iterator end_it = cur_ptr;
+            return std::make_pair(start_it, end_it);
+        }
+        std::pair<SkipList::const_iterator, SkipList::const_iterator> equal_range(const T& value) const;
+        SkipList::iterator lower_bound(const T& value){
+            return equal_range(value).second->forward[0];
+        }
+        SkipList::const_iterator lower_bound(const T& value) const{
+            return equal_range(value).second->forward[0];
+        }
+        SkipList::iterator upper_bound(const T& value);
+        SkipList::const_iterator upper_bound(const T& value) const;
         // operations
         void merge(SkipList& other);
         void merge(SkipList&& other);
