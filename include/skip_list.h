@@ -1,6 +1,10 @@
 #ifndef SKIP_LIST_H
 #define SKIP_LIST_H
 
+#include "BD_Iter.h"
+#include "Rev_Iter.h"
+#include <algorithm>
+
 template <class T>
 class SkipList{
     private:
@@ -18,6 +22,10 @@ class SkipList{
             node->element = value;
         }
     public:
+        typedef BDIterator<T> iterator;
+        typedef BDIterator<const T> const_iterator;
+        typedef RevIterator<T> reverse_iterator;
+        typedef RevIterator<const T> const_reverse_iterator;
         // ctors
         SkipList() : num_layers(0), size(0){
             head = make_node(kMAX_LAYERS, 0);
@@ -100,18 +108,18 @@ class SkipList{
         }
 
         // iterators
-        SkipList::iterator begin();
-        SkipList::const_iterator begin() const;
-        SkipList::const_iterator cbegin() const;
-        SkipList::iterator end();
-        SkipList::const_iterator end() const;
-        SkipList::const_iterator cend() const;
-        SkipList::reverse_iterator rbegin();
-        SkipList::const_reverse_iterator rbegin() const;
-        SkipList::const_reverse_iterator crbegin() const;
-        SkipList::reverse_iterator rend();
-        SkipList::const_reverse_iterator rend() const;
-        SkipList::const_reverse_iterator crend() const;
+        iterator begin(){ return iterator(head);}
+        const_iterator begin() const;
+        const_iterator cbegin() const{ return const_iterator(head);}
+        iterator end();
+        const_iterator end() const;
+        const_iterator cend() const;
+        reverse_iterator rbegin();
+        const_reverse_iterator rbegin() const;
+        const_reverse_iterator crbegin() const;
+        reverse_iterator rend();
+        const_reverse_iterator rend() const;
+        const_reverse_iterator crend() const;
 
         // capacity
         bool empty() const{
@@ -129,7 +137,7 @@ class SkipList{
         void clear(){
             erase(this->begin(), this->end());
         }
-        std::pair<SkipList::iterator, bool> insert(const T& value){
+        std::pair<iterator, bool> insert(const T& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
             Node* update[kMAX_LAYERS+1];
@@ -161,14 +169,14 @@ class SkipList{
             }
             return std::make_pair(end(), false);
         }
-        std::pair<SkipList::iterator, bool> insert(T&& value);
-        SkipList::iterator insert(SkipList::const_iterator pos, const T& value);
-        SkipList::iterator insert(SkipList::const_iterator pos, T&& value){
+        std::pair<iterator, bool> insert(T&& value);
+        iterator insert(const_iterator pos, const T& value);
+        iterator insert(const_iterator pos, T&& value){
             //use pos as hint
         }
-        SkipList::iterator insert(SkipList::const_iterator pos, size_t count, const T& value);
+        iterator insert(const_iterator pos, size_t count, const T& value);
         template <class InputIt);
-        void insert(SkipList::iterator pos, InputIt first, InputIt last){
+        void insert(iterator pos, InputIt first, InputIt last){
             while(first != last){
                 insert(pos++, value);
                 ++first;
@@ -182,8 +190,8 @@ class SkipList{
             }
         }
         template <class... Args>
-        std::pair<SkipList::iterator, bool> emplace(SkipList::const_iterator pos, Args&&... args);
-        SkipList::iterator emplace(SkipList::const_iterator pos, Args&&... args);
+        std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args);
+        iterator emplace(const_iterator pos, Args&&... args);
         size_t erase(const T& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
@@ -210,8 +218,8 @@ class SkipList{
             }
             return size;
         }
-        SkipList::iterator erase(SkipList::const_iterator pos);
-        SkipList::iterator erase(SkipList::const_iterator first, SkipList::const_iterator last){
+        iterator erase(const_iterator pos);
+        iterator erase(const_iterator first, const_iterator last){
             auto it = last;
             while(it != first){
                 auto res = erase(it--);
@@ -225,7 +233,7 @@ class SkipList{
             auto pair = equal_range(value);
             return std::distence(pair.second - pair.first);
         }
-        SkipList::iterator find(const T& value){
+        iterator find(const T& value){
             Node* cur_ptr = head;
             for(int i = num_layers; i >= 0; --i){
                 while(cur_ptr->forward[i] && cur_ptr->element < value){
@@ -236,11 +244,11 @@ class SkipList{
             }
             return this->end();
         }
-        SkipList::const_iterator find(const T& value) const;
+        const_iterator find(const T& value) const;
         bool contains(const T& value) const{
             return find(value) != this->end();
         }
-        std::pair<SkipList::iterator, SkipList::iterator> equal_range(const T& value){
+        std::pair<iterator, iterator> equal_range(const T& value){
             auto start_it = find(value);
             Node* cur_ptr = start_it;
             for(int i = num_layers; i >= 0; --i){
@@ -248,18 +256,18 @@ class SkipList{
                     cur_ptr = cur_ptr->forward[i];
                 }
             }
-            SkipList::iterator end_it = cur_ptr;
+            iterator end_it = cur_ptr;
             return std::make_pair(start_it, end_it);
         }
-        std::pair<SkipList::const_iterator, SkipList::const_iterator> equal_range(const T& value) const;
-        SkipList::iterator lower_bound(const T& value){
+        std::pair<const_iterator, const_iterator> equal_range(const T& value) const;
+        iterator lower_bound(const T& value){
             return equal_range(value).second->forward[0];
         }
-        SkipList::const_iterator lower_bound(const T& value) const{
+        const_iterator lower_bound(const T& value) const{
             return equal_range(value).second->forward[0];
         }
-        SkipList::iterator upper_bound(const T& value);
-        SkipList::const_iterator upper_bound(const T& value) const;
+        iterator upper_bound(const T& value);
+        const_iterator upper_bound(const T& value) const;
         // operations
         void merge(SkipList& other);
         void merge(SkipList&& other);
@@ -267,12 +275,12 @@ class SkipList{
         void merge(SkipList& other, Compare comp);
         template <class Compare >
         void merge(SkipList&& other, Compare comp);
-        void splice(SkipList::const_iterator pos, SkipList& other);
-        void splice(SkipList::const_iterator pos, SkipList&& other);
-        void splice(SkipList::const_iterator pos, SkipList& other, SkipList::const_iterator it);
-        void splice(SkipList::const_iterator pos, SkipList&& other, SkipList::const_iterator it);
-        void splice(SkipList::const_iterator pos, SkipList& other, SkipList::const_iterator first, SkipList::const_iterator last);
-        void splice(SkipList::const_iterator pos, SkipList&& other, SkipList::const_iterator first, SkipList::const_iterator last);
+        void splice(const_iterator pos, SkipList& other);
+        void splice(const_iterator pos, SkipList&& other);
+        void splice(const_iterator pos, SkipList& other, const_iterator it);
+        void splice(const_iterator pos, SkipList&& other, const_iterator it);
+        void splice(const_iterator pos, SkipList& other, const_iterator first, const_iterator last);
+        void splice(const_iterator pos, SkipList&& other, const_iterator first, const_iterator last);
         void remove(const T& value){
             for(auto it = this->begin(), last = this->end(); it != last){
                 if(*it == U){
