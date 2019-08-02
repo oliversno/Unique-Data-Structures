@@ -44,19 +44,12 @@ class SkipList{
             }
         }
         SkipList(const SkipList& other) : size(other.size()), num_layers(other.num_layers) {
-            if(!other.empty()){
-                Node* other_ptr = other.head;
-                Node* ptr = new Node{other_ptr->element, nullptr, nullptr};
-                head = ptr;
-                while(other_ptr->forward[0]){
-                    other_ptr = other_ptr->forward[0];
-                    Node* forward = new Node{other_ptr->element, ptr, nullptr};
-                    ptr->forward[0] = forward;
-                    ptr = ptr->forward[0]
-                }
+            head = new Node;
+            *head = *other.head;
         }
-        SkipList(const SkipList&& other){
-            //TODO
+        SkipList(const SkipList&& other) : size(other.size(), num_layers(other.num_layers()) {
+            head = other.head;
+            other.head = nullptr;
         }
         SkipList(std::initilizer_list<T> ilist) : size(0), num_layers(0){
             auto it = ilist.begin();
@@ -76,8 +69,14 @@ class SkipList{
             swap(other);
             return *this;
         }
-        SkipList& operator=(const SkipList&& other){
-            //TODO
+        SkipList& operator=(const SkipList&& other) : size(other.size()), num_layers(other.num_layers()) {
+            if(&other == this){
+                return *this;
+            }
+            delete head;
+            head = other.head;
+            other.head = nullptr;
+            return *this;
         }
         SkipList& operator=(std::initilizer_list<T> ilist){
             clear();
@@ -251,9 +250,11 @@ class SkipList{
             return res;
         }
         void swap(SkipList& other){
-            std::swap(this->num_layers, other->num_layers);
-            std::swap(this->size, other->size);
-            std::swap(this->head, other->head);
+            if(this != &other) {
+                std::swap(this->num_layers, other->num_layers);
+                std::swap(this->size, other->size);
+                std::swap(this->head, other->head);
+            }
         }
 
         // lookup
