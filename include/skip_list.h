@@ -250,7 +250,11 @@ class SkipList{
             }
             return res;
         }
-        void swap(SkipList& other);
+        void swap(SkipList& other){
+            std::swap(this->num_layers, other->num_layers);
+            std::swap(this->size, other->size);
+            std::swap(this->head, other->head);
+        }
 
         // lookup
         size_t count(const T& value) const{
@@ -368,9 +372,7 @@ bool operator>(const SkipList<T>& lhs, const SkipList<T>& rhs){
 
 template <class T>
 void swap(SkipList<T>& lhs, SkipList<T>& rhs){
-    SkipList temp{lhs};
-    lhs = rhs;
-    rhs = temp;
+    lhs.swap(rhs);
 }
 template <class T, class U>
 void erase(SkipList<T>& c, const U& value){
