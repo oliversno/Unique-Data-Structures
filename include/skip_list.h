@@ -109,17 +109,41 @@ class SkipList{
 
         // iterators
         iterator begin(){ return iterator(head);}
-        const_iterator begin() const;
+        const_iterator begin() const { return cbegin(); }
         const_iterator cbegin() const{ return const_iterator(head);}
-        iterator end();
-        const_iterator end() const;
-        const_iterator cend() const;
-        reverse_iterator rbegin();
-        const_reverse_iterator rbegin() const;
-        const_reverse_iterator crbegin() const;
-        reverse_iterator rend();
-        const_reverse_iterator rend() const;
-        const_reverse_iterator crend() const;
+        iterator end(){
+            Node* cur_ptr = head->forawrd[num_layers];
+            while(cur_ptr){
+                cur_ptr = cur_ptr->forward[num_layers];
+            }
+            return iterator(cur_ptr);
+        }
+        const_iterator end() const { return cend(); }
+        const_iterator cend() const{
+            Node* cur_ptr = head->forward[num_layers];
+            while(cur_ptr){
+                cur_ptr = cur_ptr->forward[num_layers];
+            }
+            return const_iterator(cur_ptr);
+        }
+        reverse_iterator rbegin(){
+            Node* cur_ptr = head;
+            while(cur_ptr->forward[num_layers]){
+                cur_ptr = cur_ptr->forward[num_layers];
+            }
+            return reverse_iterator(cur_ptr);
+        }
+        const_reverse_iterator rbegin() const{ return crbegin(); }
+        const_reverse_iterator crbegin() const{
+            Node* cur_ptr = head;
+            while(cur_ptr->forward[num_layers]){
+                cur_ptr = cur_ptr->forward[num_layers];
+            }
+            return const_reverse_iterator(cur_ptr);
+        }
+        reverse_iterator rend(){ return everse_iterator(head-1); }
+        const_reverse_iterator rend() const{ return crend(); }
+        const_reverse_iterator crend() const{ return const_reverse_iterator(head-1); }
 
         // capacity
         bool empty() const{
