@@ -126,3 +126,29 @@ TEST(SkipListTests, crend){
     --it;
     EXPECT_EQ(*it, 'b');
 }
+
+TEST(SkipListTests, empty){
+    SkipList<float> test;
+    EXPECT_TRUE(test.empty());
+    test.insert(1.2);
+    EXPECT_FALSE(test.empty());
+}
+
+TEST(SkipListTests, size){
+    SkipList<float> test;
+    EXPECT_EQ(test.size(), 0);
+    test.insert(1.2);
+    EXPECT_EQ(test.size(), 1);
+    test.erase(test.begin());
+    EXPECT_EQ(test.size(), 0);
+}
+
+//TODO test max_size
+
+TEST(SkipListTests, clear){
+    SkipList<std::string> test;
+    test = {"cat", "dog", "horse", "chipmunk"};
+    EXPECT_FALSE(test.empty());
+    test.clear();
+    EXPECT_TRUE(test.empty());
+}
