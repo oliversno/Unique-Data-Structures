@@ -152,3 +152,67 @@ TEST(SkipListTests, clear){
     test.clear();
     EXPECT_TRUE(test.empty());
 }
+
+TEST(SkipListTests, insertValue){
+    SkipList<int> test;
+    auto pair1 = test.insert(5);
+    auto res1 = std::make_pair(test.begin(), true);
+    EXPECT_EQ(pair1, res1);
+    auto pair2 = test.insert(5);
+    auto res2 = std::make_pair(test.end(), false);
+    EXPECT_EQ(pair2, test2);
+}
+
+TEST(SkipListTests, insertMove){
+    SkipList<int> test;
+    auto pair1 = test.insert(std::move(5));
+    auto res1 = std::make_pair(test.begin(), true);
+    EXPECT_EQ(pair1, res1);
+    auto pair2 = test.insert(std::move(5));
+    auto res2 = std::make_pair(test.end(), false);
+    EXPECT_EQ(pair2, test2);
+}
+
+TEST(SkipListTests, HinetInsertValue){
+    SkipList<int> test;
+    auto pair1 = test.insert(test.begin(), 5);
+    auto res1 = std::make_pair(test.begin(), true);
+    EXPECT_EQ(pair1, res1);
+    auto pair2 = test.insert(test.end(), 5);
+    auto res2 = std::make_pair(test.end(), false);
+    EXPECT_EQ(pair2, test2);
+}
+
+TEST(SkipListTests, HintInsertMove){
+    SkipList<int> test;
+    auto pair1 = test.insert(test.begin(), std::move(5));
+    auto res1 = std::make_pair(test.begin(), true);
+    EXPECT_EQ(pair1, res1);
+    auto pair2 = test.insert(test.end(), std::move(5));
+    auto res2 = std::make_pair(test.end(), false);
+    EXPECT_EQ(pair2, test2);
+}
+
+//TODO test multiple insert
+
+TEST(SkipListTests, insertRange){
+    SkipList<int> test;
+    std::vector<int> vec = {1,2,3,4,5};
+    test.insert(test.end(), vec.begin(), vec.end());
+    std::vector<int> res;
+    for(int elem : test){
+        res.push_back(elem);
+    }
+    EXPECT_EQ(vec, res);
+}
+
+TEST(SkipListTests, insertIList){
+    SkipList<int> test;
+    std::vector<int> vec = {1,2,3,4,5};
+    test.insert({1,2,3,4,5});
+    std::vector<int> res;
+    for(int elem : test){
+        res.push_back(elem);
+    }
+    EXPECT_EQ(vec, res);
+}
