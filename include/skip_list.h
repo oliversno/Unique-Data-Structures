@@ -207,8 +207,14 @@ class SkipList{
             }
         }
         template <class... Args>
-        std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args);
-        iterator emplace(const_iterator pos, Args&&... args);
+        std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args){
+            T elem{args};
+            return insert(pos, elem);
+        }
+        iterator emplace(const_iterator pos, Args&&... args){
+            T elem{args};
+            return insert(pos, elem).first;
+        }
         size_t erase(const T& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
