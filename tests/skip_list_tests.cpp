@@ -306,3 +306,63 @@ TEST(SkipListTests, contains){
     EXPECT_FALSE(test.contains('c'));
     EXPECT_TRUE(test.contains('a'));
 }
+
+TEST(SkipListTests, equal_range){
+    SkipList<int> test;
+    test.insert(100);
+    test.insert(200);
+    test.insert(200);
+    test.insert(300);
+    auto pair = test.equal_range(200);
+    EXPECT_EQ(pair.first, test.begin()+1);
+    EXPECT_EQ(pair.second, test.end()-1);
+}
+
+TEST(SkipListTests, equal_rangeNot){
+    SkipList<int> test;
+    test.insert(100);
+    auto pair = test.equal_range(500);
+    EXPECT_EQ(pair.first, test.end());
+    EXPECT_EQ(pair.second, test.end());
+}
+TEST(SkipListTests, equal_rangeConst){
+    std::vector<int> vec = {100, 200, 200, 300};
+    const SkipList<int> test{vec.begin(), vec.end()};
+    auto pair = test.equal_range(200);
+    EXPECT_EQ(pair.first, test.begin()+1);
+    EXPECT_EQ(pair.second, test.end()-1);
+}
+
+TEST(SkipListTests, equal_rangeNotConst){
+    std::vector<int> vec = {100};
+    const SkipList<int> test{vec.begin(), vec.end()};
+    auto pair = test.equal_range(500);
+    EXPECT_EQ(pair.first, test.end());
+    EXPECT_EQ(pair.second, test.end());
+}
+
+TEST(SkipListTests, lower_bound){
+    SkipList<float> test;
+    test.insert(3.14);
+    test.insert(2.0);
+    EXPECT_EQ(test.lower_bound(1.5), test.begin());
+}
+
+TEST(SkipListTests, upper_bound){
+    SkipList<float> test;
+    test.insert(5.5);
+    test.insert(3.333);
+    EXPECT_EQ(test.upper_bound(4), test.begin());
+}
+
+TEST(SkipListTests, lower_boundConst){
+    std::set<float> set = {3.14, 2.0};
+    const SkipList<float> test{set.begin(), set.end()};
+    EXPECT_EQ(test.lower_bound(1.5), test.cbegin());
+}
+
+TEST(SkipListTests, upper_boundConst){
+    std::set<float> set = {5.5, 3.333};
+    const SkipList<float> test{set.begin(), set.end()};
+    EXPECT_EQ(test.upper_bound(4), test.cbegin());
+}
