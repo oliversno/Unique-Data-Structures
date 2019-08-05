@@ -277,3 +277,32 @@ TEST(SkipListTests, swap){
     EXPECT_EQ(one, two_copy);
     EXPECT_EQ(two, one_copy);
 }
+
+TESt(SkipListTests, count){
+    SkipList<char> test;
+    test.insert('q');
+    test.insert('q');
+    test.insert('h');
+    EXPECT_EQ(test.count('p'), 1);
+    EXPECT_EQ(test.count('q'), 2);
+}
+
+TEST(SkipListTests, find){
+    SkipList<int> test;
+    test.insert(2);
+    test.insert(3);
+    EXPECT_EQ(test.find(3), test.begin()+1);
+}
+
+TEST(SkipListTests, findConst){
+    std::vector<int> vec = {2,3};
+    SkipList<int> test{vec.begin(), vec.end()};
+    EXPECT_EQ(test.find(3), test.cbegin()+1);
+}
+
+TEST(SkipListTests, contains){
+    SkipList<char> test;
+    test.insert('a');
+    EXPECT_FALSE(test.contains('c'));
+    EXPECT_TRUE(test.contains('a'));
+}
