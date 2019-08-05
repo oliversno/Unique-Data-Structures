@@ -232,3 +232,48 @@ TEST(SkipListTests, emplace Const){
     std::vector<char> res = {'c','c','c'};
     EXPECT_EQ(res, vec);
 }
+
+TEST(SkipListTests, eraseValue){
+    SkipList<int> test;
+    test.insert(3);
+    EXPECT_EQ(test.size(), 1);
+    EXPECT_EQ(test.back(), 3);
+    size_t new_size = test.erase(36);
+    EXPECT_EQ(new_size, 1);
+    EXPECT_FALSE(test.empty());
+    new_size = test.erase(3);
+    EXPECT_EQ(new_size, 0);
+    EXPECT_TRUE(test.empty());
+}
+
+TEST(SkipListTests, erasePos){
+    SkipList<int> test;
+    test.insert(3);
+    test.insert(40);
+    test.erase(test.begin());
+    EXPECT_EQ(test.size(), 1);
+    EXPECT_EQ(test.front(), 3)
+}
+
+TEST(SkipListTests, eraseRange){
+    SkipList<float> test;
+    test.insert(3.14);
+    test.insert(1.36);
+    test.insert(9.999);
+    EXPECT_EQ(test.size(), 3);
+    test.erase(test.begin()+1, test.end());
+    EXPECT_EQ(test.size(), 1);
+    EXPECT_EQ(test.front(), 1.36);
+}
+
+TEST(SkipListTests, swap){
+    SkipList<int> one;
+    one = {1,2,3};
+    SkipList<int> one_copy{one};
+    SkipList<int> two;
+    two = {4,5,6};
+    SkipList<int> two_copy{two};
+    one.swap(two);
+    EXPECT_EQ(one, two_copy);
+    EXPECT_EQ(two, one_copy);
+}
