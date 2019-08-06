@@ -298,18 +298,20 @@ class SkipList{
         iterator upper_bound(const T& value);
         const_iterator upper_bound(const T& value) const;
         // operations
-        void merge(SkipList& other);
-        void merge(SkipList&& other);
+        void merge(SkipList& other){
+            for(T& elem : other){
+                insert(elem);
+            }
+        }
+        void merge(SkipList&& other){
+            for(T& elem : other){
+                insert(std::move(other));
+            }
+        }
         template <class Compare >
         void merge(SkipList& other, Compare comp);
         template <class Compare >
         void merge(SkipList&& other, Compare comp);
-        void splice(const_iterator pos, SkipList& other);
-        void splice(const_iterator pos, SkipList&& other);
-        void splice(const_iterator pos, SkipList& other, const_iterator it);
-        void splice(const_iterator pos, SkipList&& other, const_iterator it);
-        void splice(const_iterator pos, SkipList& other, const_iterator first, const_iterator last);
-        void splice(const_iterator pos, SkipList&& other, const_iterator first, const_iterator last);
         void remove(const T& value){
             for(auto it = this->begin(), last = this->end(); it != last){
                 if(*it == U){
