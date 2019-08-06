@@ -366,3 +366,32 @@ TEST(SkipListTests, upper_boundConst){
     const SkipList<float> test{set.begin(), set.end()};
     EXPECT_EQ(test.upper_bound(4), test.cbegin());
 }
+
+TEST(SkipListTests, merge){
+    SkipList<int> one = {1,2,4,5};
+    SkipList<int> two = {3,6};
+    one.merge(two);
+    EXPECT_EQ(one.size(), 6);
+}
+
+TEST(SkipListTests, mergeMove){
+    SkipList<int> one = {1,2,4,5};
+    SkipList<int> two = {3,6};
+    one.merge(std::move(two));
+    EXPECT_EQ(one.size(), 6);
+}
+
+//TODO merge comparator tests
+
+TEST(SkipListTests, remove){
+    SkipList<int> test = {60};
+    EXPECT_FALSE(test.empty());
+    test.remove(60);
+    EXPECT_TRUE(test.empty());
+}
+
+TEST(SkipListTests, remove_if){
+    SkipList<int> test = {1,2,3,4};
+    bool is_even = [](int i){ return i%2; }
+    EXPECT_EQ(test.remove_if(is_even), 2);
+}

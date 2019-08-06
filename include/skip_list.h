@@ -314,7 +314,7 @@ class SkipList{
         void merge(SkipList&& other, Compare comp);
         void remove(const T& value){
             for(auto it = this->begin(), last = this->end(); it != last){
-                if(*it == U){
+                if(*it == value){
                     it = this->erase(it);
                 }
                 else{
