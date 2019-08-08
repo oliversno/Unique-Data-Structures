@@ -21,6 +21,16 @@ class SkipList{
             Node* node = new Node;
             node->element = value;
         }
+        void delete_node(Node* node){
+            if(!node){
+                delete_node(forward[0]);
+                delete[] forward;
+                for(int i = 0; i < num_layers; ++i){
+                    forward[i] = nullptr;
+                }
+            }
+
+        }
     public:
         typedef BDIterator<T> iterator;
         typedef BDIterator<const T> const_iterator;
@@ -55,7 +65,7 @@ class SkipList{
 
         // dtor
         ~SkipList(){
-            //TODO
+            delete_node(head);
         }
 
         // assignment operators
