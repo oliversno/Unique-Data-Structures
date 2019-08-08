@@ -395,3 +395,37 @@ TEST(SkipListTests, remove_if){
     bool is_even = [](int i){ return i%2; }
     EXPECT_EQ(test.remove_if(is_even), 2);
 }
+
+TEST(SkipListTests, equality){
+    SkipList<int> one;
+    SkipList<int> two;
+    EXPECT_TRUE(one == one);
+    EXPECT_TRUE(one == two);
+    two.insert(5);
+    EXPECT_FALSE(one == two);
+}
+
+TEST(SkipListTests, equalityNot){
+    SkipList<int> one;
+    SkipList<int> two;
+    EXPECT_FALSE(one != one);
+    EXPECT_FALSE(one != two);
+    two.insert(5);
+    EXPECT_TRUE(one != two);
+}
+
+TEST(SkipListTests, lessThan){
+    SkipList<int> one;
+    SkipList<int> two = {100};
+    EXPECT_FALSE(one < one);
+    EXPECT_TRUE(one < two);
+    EXPECT_FALSE(two < one);
+}
+
+TEST(SkipListTests, swap){
+    SkipList<char> one;
+    SkipList<char> two = {'g', 't'};
+    swap(one, two);
+    EXPECT_TRUE(two.empty());
+    EXPECT_FALSE(one.empty());
+}
