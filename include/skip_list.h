@@ -12,11 +12,11 @@ class SkipList{
         static const unsigned int kMAX_LAYERS = 6;
         unsigned int num_layers;
         unsigned int size;
-        Node* head;
         struct Node{
             T element;
             Node* forward[num_layers];
         };
+        Node* head;
         Node* make_node(const unsigned int level, const T& value) const{
             Node* node = new Node;
             node->element = value;
@@ -277,13 +277,23 @@ class SkipList{
             for(int i = num_layers; i >= 0; --i){
                 while(cur_ptr->forward[i] && cur_ptr->element < value){
                     if(cur_ptr->element == value)
-                        return //ptr to iterator
+                        return iterator(cur_ptr);
                     cur_ptr = cur_ptr->forward[i];
                 }
             }
             return this->end();
         }
-        const_iterator find(const T& value) const;
+        const_iterator find(const T& value) const{
+            const Node* cur_ptr = head;
+            for(int i = num_layers; i >= 0; --i){
+                while(cur_ptr->forward[i] && cur_ptr->element < value){
+                    if(cur_ptr->element == value)
+                        return const_iterator(cur_ptr);
+                    cur_ptr = cur_ptr->forward[i];
+                }
+            }
+            return this->cend();
+        }
         bool contains(const T& value) const{
             return find(value) != this->end();
         }
