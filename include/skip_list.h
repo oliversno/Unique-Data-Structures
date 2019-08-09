@@ -144,7 +144,7 @@ class SkipList{
             }
             return const_reverse_iterator(cur_ptr);
         }
-        reverse_iterator rend(){ return everse_iterator(head-1); }
+        reverse_iterator rend(){ return reverse_iterator(head-1); }
         const_reverse_iterator rend() const{ return crend(); }
         const_reverse_iterator crend() const{ return const_reverse_iterator(head-1); }
 
@@ -177,7 +177,7 @@ class SkipList{
                 update[i] = cur_ptr;
             }
             cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
-            if(!cur_ptr || cur_ptr->element != value){
+            if(!cur_ptr || cur_ptr->element < value){
                 unsigned int rand_layer = randomlevel();
                 if(rand_layer > num_layers){
                     for(int i = num_layers+1; i < rand_layer+1; ++i){
@@ -192,7 +192,7 @@ class SkipList{
                     update[i]->forward[i] = new_node;
                 }
                 ++size;
-                return std::make_pair(//new_node as it, true);
+                return std::make_pair(iterator(new_node), true);
             }
             return std::make_pair(end(), false);
         }
