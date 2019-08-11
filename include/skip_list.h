@@ -225,7 +225,8 @@ class SkipList{
         }
         template <class... Args>
         std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args){
-            value_type elem{args};
+            //TODO fix emplace
+            std::allocator_traits.construct(allocator_type, pos, args);
             return insert(pos, elem);
         }
         template <class... Args>
@@ -260,9 +261,10 @@ class SkipList{
         }
         iterator erase(const_iterator pos);
         iterator erase(const_iterator first, const_iterator last){
+            auto res = this->cend();
             auto it = last;
             while(it != first){
-                auto res = erase(it--);
+                res = erase(it--);
             }
             return res;
         }
@@ -277,7 +279,7 @@ class SkipList{
         // lookup
         size_t count(const T& value) const{
             auto pair = equal_range(value);
-            return std::distence(pair.second - pair.first);
+            return std::distance(pair.second - pair.first);
         }
         iterator find(const T& value){
             Node* cur_ptr = head;
@@ -308,7 +310,7 @@ class SkipList{
             auto start_it = find(value);
             Node* cur_ptr = start_it;
             for(int i = num_layers; i >= 0; --i){
-                while(cur_ptr-forward[i] && cur_ptr->element <= value){
+                while(cur_ptr->forward[i] && cur_ptr->element <= value){
                     cur_ptr = cur_ptr->forward[i];
                 }
             }
@@ -340,7 +342,7 @@ class SkipList{
         template <class Comp>
         void merge(SkipList&& other, Comp comp);
         void remove(const T& value){
-            for(auto it = this->begin(), last = this->end(); it != last){
+            for(auto it = this->begin(); auto last = this->end(); it != last){
                 if(*it == value){
                     it = this->erase(it);
                 }
@@ -351,7 +353,7 @@ class SkipList{
         }
         template <class UnaryPred>
         void remove_if(UnaryPred p){
-            for(auto it = this->begin(), last = this->end(); it != last){
+            for(auto it = this->begin(); auto last = this->end(); it != last){
                 if(pred(*it)){
                     it = erase(it);
                 }
@@ -388,7 +390,7 @@ bool operator<=(const SkipList<T>& lhs, const SkipList<T>& rhs){
 }
 template <class T>
 bool operator<(const SkipList<T>& lhs, const SkipList<T>& rhs){
-    return std::lexicographical_compare(lhs.begin(), lhs.end()
+    return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                         rhs.begin(), rhs.end());
 }
 template <class T>
