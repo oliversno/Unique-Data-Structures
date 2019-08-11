@@ -4,17 +4,23 @@
 #include "BD_Iter.h"
 #include "Rev_Iter.h"
 #include <algorithm>
+#include <initializer_list>
+#include <cmath>
+#include <random>
 
-template <class T>
+template <class T,
+          class Compare = std::less<T>,
+          class Alloc = std::allocator<T>
+          >
 class SkipList{
     private:
-        static const float kPROMOTION_PROB = 0.5;
-        static const unsigned int kMAX_LAYERS = 6;
+        static constexpr float kPROMOTION_PROB = 0.5;
+        static constexpr unsigned int kMAX_LAYERS = 6;
         unsigned int num_layers;
-        unsigned int size;
+        unsigned int length;
         struct Node{
             T element;
-            Node* forward[num_layers];
+            Node* forward[kMAX_LAYERS];
         };
         Node* head;
         Node* make_node(const unsigned int level, const T& value) const{
@@ -23,21 +29,41 @@ class SkipList{
         }
         void delete_node(Node* node){
             if(!node){
-                delete_node(forward[0]);
-                delete[] forward;
+                delete_node(node->forward[0]);
+                delete[] node->forward;
                 for(int i = 0; i < num_layers; ++i){
-                    forward[i] = nullptr;
+                    node->forward[i] = nullptr;
                 }
             }
-
         }
+    unsigned int random_level(){
+        std::random_device rd;
+        std::mt19937 gen{rd()};
+        std::uniform_real_distribution<> distr{0.0, 1.0};
+        unsigned int level = 0;
+        while(distr(gen) < kPROMOTION_PROB && level < kMAX_LAYERS){
+            ++level;
+        }
+        return level;
+    }
     public:
-        typedef BDIterator<T> iterator;
-        typedef BDIterator<const T> const_iterator;
-        typedef RevIterator<T> reverse_iterator;
-        typedef RevIterator<const T> const_reverse_iterator;
+        typedef T key_type;
+        typedef T value_type;
+        typedef Compare key_compare;
+        typedef Compare value_compare;
+        typedef Alloc allocator_type;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef typename std::allocator_traits<allocator_type>::pointer pointer;
+        typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
+        typedef BDIterator<const value_type> iterator;
+        typedef BDIterator<const value_type> const_iterator;
+        typedef RevIterator<iterator> reverse_iterator;
+        typedef RevIterator<const_iterator> const_reverse_iterator;
+        typedef typename std::iterator_traits<iterator>::difference_type difference_type;
+
         // ctors
-        SkipList() : num_layers(0), size(0){
+        SkipList() : num_layers(0), length(0){
             head = make_node(kMAX_LAYERS, 0);
         }
         template <class InputIt>
@@ -47,15 +73,15 @@ class SkipList{
                 push_back(*it);
             }
         }
-        SkipList(const SkipList& other) : size(other.size()), num_layers(other.num_layers) {
+        SkipList(const SkipList& other) : length(other.length()), num_layers(other.num_layers) {
             head = new Node;
             *head = *other.head;
         }
-        SkipList(const SkipList&& other) : size(other.size(), num_layers(other.num_layers()) {
+        SkipList(const SkipList&& other) : length(other.length()), num_layers(other.num_layers()) {
             head = other.head;
             other.head = nullptr;
         }
-        SkipList(std::initilizer_list<T> ilist) : size(0), num_layers(0){
+        SkipList(std::initializer_list<value_type> ilist) : length(0), num_layers(0){
             auto it = ilist.begin();
             while(it != ilist.end()){
                 insert(*it);
@@ -73,98 +99,79 @@ class SkipList{
             swap(other);
             return *this;
         }
-        SkipList& operator=(const SkipList&& other) : size(other.size()), num_layers(other.num_layers()) {
+        SkipList& operator=(const SkipList&& other) {
             if(&other == this){
                 return *this;
             }
+            length = other.length;
+            num_layers = other.num_layers;
             delete head;
             head = other.head;
             other.head = nullptr;
             return *this;
         }
-        SkipList& operator=(std::initilizer_list<T> ilist){
+        SkipList& operator=(std::initializer_list<value_type> ilist){
             clear();
             *this = new SkipList(ilist);
             return *this;
         }
 
-        // element access
-        T& front(){
-            return head->element;
-        }
-        const T& front() const{
-            return head->element;
-        }
-        T& back(){
-            Node* ptr = head;
-            while(ptr->forward[0]){
-                ptr = ptr->forward[0];
-            }
-            return ptr->element;
-        }
-        const T& back() const{
-            Node* ptr = head;
-            while(ptr->forward[0]){
-                ptr = ptr->forward[0];
-            }
-            return ptr->element;
-        }
-
         // iterators
-        iterator begin(){ return iterator(head);}
-        const_iterator begin() const { return cbegin(); }
+        iterator begin() noexcept{ return iterator(head);}
+        const_iterator begin() const noexcept{ return cbegin(); }
         const_iterator cbegin() const{ return const_iterator(head);}
-        iterator end(){
+        iterator end() noexcept{
             Node* cur_ptr = head->forawrd[num_layers];
             while(cur_ptr){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
             return iterator(cur_ptr);
         }
-        const_iterator end() const { return cend(); }
-        const_iterator cend() const{
+        const_iterator end() const noexcept{ return cend(); }
+        const_iterator cend() const noexcept{
             Node* cur_ptr = head->forward[num_layers];
             while(cur_ptr){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
             return const_iterator(cur_ptr);
         }
-        reverse_iterator rbegin(){
+        reverse_iterator rbegin() noexcept{
             Node* cur_ptr = head;
             while(cur_ptr->forward[num_layers]){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
             return reverse_iterator(cur_ptr);
         }
-        const_reverse_iterator rbegin() const{ return crbegin(); }
-        const_reverse_iterator crbegin() const{
+        const_reverse_iterator rbegin() const noexcept{ return crbegin(); }
+        const_reverse_iterator crbegin() const noexcept{
             Node* cur_ptr = head;
             while(cur_ptr->forward[num_layers]){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
             return const_reverse_iterator(cur_ptr);
         }
-        reverse_iterator rend(){ return reverse_iterator(head-1); }
-        const_reverse_iterator rend() const{ return crend(); }
-        const_reverse_iterator crend() const{ return const_reverse_iterator(head-1); }
+        reverse_iterator rend() noexcept{ return reverse_iterator(head-1); }
+        const_reverse_iterator rend() const noexcept{ return crend(); }
+        const_reverse_iterator crend() const noexcept{ return const_reverse_iterator(head-1); }
 
         // capacity
-        bool empty() const{
-            return size == 0;
+        bool empty() const noexcept{
+            return length == 0;
         }
-        size_t size() const{
-            return size;
+        size_t size() const noexcept{
+            return length;
         }
-        size_t max_size() const{
+        size_t max_size() const noexcept{
             unsigned int arch_bit = sizeof(void*)*8;
-            return std::pow(2, arch_bit)/sizeof(T) - 1;
+            return std::pow(2, arch_bit)/sizeof(value_type) - 1;
         }
 
         // modifiers
-        void clear(){
+        void clear() noexcept{
+            //TODO don't use erase
             erase(this->begin(), this->end());
         }
-        std::pair<iterator, bool> insert(const T& value){
+        std::pair<iterator, bool> insert(const value_type& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
             Node* update[kMAX_LAYERS+1];
@@ -178,12 +185,12 @@ class SkipList{
             }
             cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
             if(!cur_ptr || cur_ptr->element < value){
-                unsigned int rand_layer = randomlevel();
+                unsigned int rand_layer = random_level();
                 if(rand_layer > num_layers){
                     for(int i = num_layers+1; i < rand_layer+1; ++i){
                         update[i] = head;
                     }
-                    num_layers = rand_layer
+                    num_layers = rand_layer;
                 }
                 Node* new_node = new Node;
                 new_node->element = value;
@@ -191,25 +198,25 @@ class SkipList{
                     new_node->forward[i] = update[i]->forward[i];
                     update[i]->forward[i] = new_node;
                 }
-                ++size;
+                ++length;
                 return std::make_pair(iterator(new_node), true);
             }
             return std::make_pair(end(), false);
         }
-        std::pair<iterator, bool> insert(T&& value);
-        iterator insert(const_iterator pos, const T& value);
-        iterator insert(const_iterator pos, T&& value){
+        std::pair<iterator, bool> insert(value_type&& value);
+        iterator insert(const_iterator pos, const value_type& value);
+        iterator insert(const_iterator pos, value_type&& value){
             //use pos as hint
         }
-        iterator insert(const_iterator pos, size_t count, const T& value);
-        template <class InputIt);
+        iterator insert(const_iterator pos, size_t count, const value_type& value);
+        template <class InputIt>
         void insert(iterator pos, InputIt first, InputIt last){
-            while(first != last){
-                insert(pos++, value);
-                ++first;
+            auto it = first;
+            while(it != last){
+                insert(pos++, *it++);
             }
         }
-        void insert(std::initilizer_list<T> ilist){
+        void insert(std::initializer_list<value_type> ilist){
             auto it = ilist.begin();
             while(it != ilist.end()){
                 insert(*it);
@@ -218,14 +225,14 @@ class SkipList{
         }
         template <class... Args>
         std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args){
-            T elem{args};
+            value_type elem{args};
             return insert(pos, elem);
         }
+        template <class... Args>
         iterator emplace(const_iterator pos, Args&&... args){
-            T elem{args};
-            return insert(pos, elem).first;
+            return empalce(pos, args).first;
         }
-        size_t erase(const T& value){
+        size_t erase(const value_type& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
             Node* update[kMAX_LAYERS+1];
@@ -247,9 +254,9 @@ class SkipList{
                 while(num_layers > 0 && !head->forawrd[num_layers]){
                     --num_layers;
                 }
-                --size;
+                --length;
             }
-            return size;
+            return length;
         }
         iterator erase(const_iterator pos);
         iterator erase(const_iterator first, const_iterator last){
@@ -262,7 +269,7 @@ class SkipList{
         void swap(SkipList& other){
             if(this != &other) {
                 std::swap(this->num_layers, other->num_layers);
-                std::swap(this->size, other->size);
+                std::swap(this->length, other->length);
                 std::swap(this->head, other->head);
             }
         }
@@ -328,10 +335,10 @@ class SkipList{
                 insert(std::move(other));
             }
         }
-        template <class Compare >
-        void merge(SkipList& other, Compare comp);
-        template <class Compare >
-        void merge(SkipList&& other, Compare comp);
+        template <class Comp>
+        void merge(SkipList& other, Comp comp);
+        template <class Comp>
+        void merge(SkipList&& other, Comp comp);
         void remove(const T& value){
             for(auto it = this->begin(), last = this->end(); it != last){
                 if(*it == value){
@@ -356,13 +363,13 @@ class SkipList{
         template <class UnaryPred>
         size_t remove_if(UnaryPred p){
             remove_if(p);
-            return size;
+            return length;
         }
 };
 
 template <class T>
 bool operator==(const SkipList<T>& lhs, const SkipList<T>& rhs){
-    if(lhs.size() != rhs.size()){return false; }
+    if(lhs.length() != rhs.length()){return false; }
     auto lhs_it = lhs.begin();
     auto rhs_it = rhs.begin();
     while(lhs_it != lhs.end()){
