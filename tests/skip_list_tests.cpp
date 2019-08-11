@@ -53,26 +53,16 @@ TEST(SkipListTests, assignment){
 TEST(SkipListTests, moveAssignment){
     SkipList<int> one{5, 7};
     SkipList<int> two;
-    two = std::move(one)
+    two = std::move(one);
     EXPECT_EQ(one, two);
 }
 
 TEST(SkipListTests, ilistAssignment){
     SkipList<int> test;
     test = {1,2};
-    EXPECT_EQ(test.front(), 1);
-    EXPECT_EQ(test.back(), 2);
+    EXPECT_EQ(*test.cbegin(), 1);
+    EXPECT_EQ(*test.cend(), 2);
     EXPECT_EQ(test.size(), 2);
-}
-
-TEST(SkipListTests, front){
-    SkipList<char> test{'a','b','c'};
-    EXPECT_EQ(test.front(), 'a');
-}
-
-TEST(SkipListTests, back){
-    SkipList<char> test{'a','b','c'};
-    EXPECT_EQ(test.back(), 'c');
 }
 
 TEST(SkipListTests, begin){
@@ -160,7 +150,7 @@ TEST(SkipListTests, insertValue){
     EXPECT_EQ(pair1, res1);
     auto pair2 = test.insert(5);
     auto res2 = std::make_pair(test.end(), false);
-    EXPECT_EQ(pair2, test2);
+    EXPECT_EQ(pair2, res2);
 }
 
 TEST(SkipListTests, insertMove){
@@ -170,7 +160,7 @@ TEST(SkipListTests, insertMove){
     EXPECT_EQ(pair1, res1);
     auto pair2 = test.insert(std::move(5));
     auto res2 = std::make_pair(test.end(), false);
-    EXPECT_EQ(pair2, test2);
+    EXPECT_EQ(pair2, res2);
 }
 
 TEST(SkipListTests, HinetInsertValue){
@@ -180,7 +170,7 @@ TEST(SkipListTests, HinetInsertValue){
     EXPECT_EQ(pair1, res1);
     auto pair2 = test.insert(test.end(), 5);
     auto res2 = std::make_pair(test.end(), false);
-    EXPECT_EQ(pair2, test2);
+    EXPECT_EQ(pair2, res2);
 }
 
 TEST(SkipListTests, HintInsertMove){
@@ -190,7 +180,7 @@ TEST(SkipListTests, HintInsertMove){
     EXPECT_EQ(pair1, res1);
     auto pair2 = test.insert(test.end(), std::move(5));
     auto res2 = std::make_pair(test.end(), false);
-    EXPECT_EQ(pair2, test2);
+    EXPECT_EQ(pair2, res2);
 }
 
 //TODO test multiple insert
@@ -220,15 +210,15 @@ TEST(SkipListTests, insertIList){
 TEST(SkipListTests, emplace){
     SkipList<std::vector<char>> test;
     test.emplace(test.begin(), 3, 'c');
-    std::vector<char> vec = test.front();
+    std::vector<char> vec = *test.begin();
     std::vector<char> res = {'c','c','c'};
     EXPECT_EQ(res, vec);
 }
 
-TEST(SkipListTests, emplace Const){
+TEST(SkipListTests, emplaceConst){
     const SkipList<std::vector<char>> test;
     test.emplace(test.begin(), 3, 'c');
-    std::vector<char> vec = test.front();
+    std::vector<char> vec = *test.cbegin();
     std::vector<char> res = {'c','c','c'};
     EXPECT_EQ(res, vec);
 }
@@ -237,7 +227,7 @@ TEST(SkipListTests, eraseValue){
     SkipList<int> test;
     test.insert(3);
     EXPECT_EQ(test.size(), 1);
-    EXPECT_EQ(test.back(), 3);
+    EXPECT_EQ(*test.begin(), 3);
     size_t new_size = test.erase(36);
     EXPECT_EQ(new_size, 1);
     EXPECT_FALSE(test.empty());
@@ -252,7 +242,7 @@ TEST(SkipListTests, erasePos){
     test.insert(40);
     test.erase(test.begin());
     EXPECT_EQ(test.size(), 1);
-    EXPECT_EQ(test.front(), 3)
+    EXPECT_EQ(*test.begin(), 3)
 }
 
 TEST(SkipListTests, eraseRange){
@@ -263,7 +253,7 @@ TEST(SkipListTests, eraseRange){
     EXPECT_EQ(test.size(), 3);
     test.erase(test.begin()+1, test.end());
     EXPECT_EQ(test.size(), 1);
-    EXPECT_EQ(test.front(), 1.36);
+    EXPECT_EQ(*test.begin(), 1.36);
 }
 
 TEST(SkipListTests, swap){
@@ -278,7 +268,7 @@ TEST(SkipListTests, swap){
     EXPECT_EQ(two, one_copy);
 }
 
-TESt(SkipListTests, count){
+TEST(SkipListTests, count){
     SkipList<char> test;
     test.insert('q');
     test.insert('q');
