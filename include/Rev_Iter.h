@@ -9,7 +9,7 @@ protected:
     T* m_ptr;
 public:
     RevIterator(T* ptr = nullptr) : m_ptr(ptr){}
-    RevIterator(const RevIterator<T>* iter) = default;
+    RevIterator(const RevIterator<T>& iter) = default;
     ~RevIterator(){}
 
     RevIterator<T>& operator=(const RevIterator<T>& iter) = default;
@@ -22,8 +22,8 @@ public:
     }
     bool operator==(const RevIterator<T>& rhs) const{ return m_ptr == rhs.getConstPtr(); }
     bool operator!=(const RevIterator<T>& rhs) const{ return m_ptr != rhs.getConstPtr(); }
-    RevIterator<T>& operator+=(const ptr_diff& mov){ m_ptr -= mov; return *this; }
-    RevIterator<T>& operator-=(const ptr_diff& mov){ m_ptr += mov; return *this; }
+    RevIterator<T>& operator+=(const ptrdiff_t& mov){ m_ptr -= mov; return *this; }
+    RevIterator<T>& operator-=(const ptrdiff_t& mov){ m_ptr += mov; return *this; }
     RevIterator<T>& operator++(){ --m_ptr; return *this; }
     RevIterator<T>& operator--(){ ++m_ptr; return *this; }
     RevIterator<T>& operator++(ptrdiff_t){ auto temp{*this}; --m_ptr; return temp; }
@@ -42,7 +42,7 @@ public:
         m_ptr = old_ptr;
         return temp;    
     }
-    ptrdiff_t operator-(const RevIterator<T>& rhs) { return std::distence(rhs.getPtr(), this->getPtr()); }
+    ptrdiff_t operator-(const RevIterator<T>& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
 
     BDIterator<T> base(){
         BDIterator<T> forwardIt{this->m_ptr};

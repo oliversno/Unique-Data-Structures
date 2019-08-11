@@ -1,8 +1,9 @@
 #ifndef BD_ITER_H
 #define BD_ITER_H
+#include <iterator>
 
 template <typename T>
-class BDIterator : public std::iterator<std::bidirection_iterator_tag,
+class BDIterator : public std::iterator<std::bidirectional_iterator_tag,
                                         T,
                                         ptrdiff_t,
                                         T*,
@@ -12,7 +13,7 @@ protected:
     T* m_ptr;
 public:
     BDIterator(T* ptr = nullptr) : m_ptr(ptr){}
-    BDIterator(const BDIterator<T>* iter) = default;
+    BDIterator(const BDIterator<T>& iter) = default;
     ~BDIterator(){}
 
     BDIterator<T>& operator=(const BDIterator<T>& iter) = default;
@@ -25,8 +26,8 @@ public:
     }
     bool operator==(const BDIterator<T>& rhs) const{ return m_ptr == rhs.getConstPtr(); }
     bool operator!=(const BDIterator<T>& rhs) const{ return m_ptr != rhs.getConstPtr(); }
-    BDIterator<T>& operator+=(const ptr_diff& mov){ m_ptr += mov; return *this; }
-    BDIterator<T>& operator-=(const ptr_diff& mov){ m_ptr -= mov; return *this; }
+    BDIterator<T>& operator+=(const ptrdiff_t& mov){ m_ptr += mov; return *this; }
+    BDIterator<T>& operator-=(const ptrdiff_t& mov){ m_ptr -= mov; return *this; }
     BDIterator<T>& operator++(){ ++m_ptr; return *this; }
     BDIterator<T>& operator--(){ --m_ptr; return *this; }
     BDIterator<T>& operator++(ptrdiff_t){ auto temp{*this}; ++m_ptr; return temp; }
@@ -45,7 +46,7 @@ public:
         m_ptr = old_ptr;
         return temp;    
     }
-    ptrdiff_t operator-(const BDIterator<T>& rhs) { return std::distence(rhs.getPtr(), this->getPtr()); }
+    ptrdiff_t operator-(const BDIterator<T>& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
     T& operator*(){ return *m_ptr; }
     const T& operator*() const{ return *m_ptr; }
     T* operator->(){ return m_ptr; }
