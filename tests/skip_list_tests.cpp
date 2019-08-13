@@ -412,7 +412,7 @@ TEST(SkipListTests, lessThan){
     EXPECT_FALSE(two < one);
 }
 
-TEST(SkipListTests, swap){
+TEST(SkipListTests, Swap){
     SkipList<char> one;
     SkipList<char> two = {'g', 't'};
     swap(one, two);

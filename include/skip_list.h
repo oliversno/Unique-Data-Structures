@@ -68,9 +68,8 @@ class SkipList{
         }
         template <class InputIt>
         SkipList(InputIt first, InputIt last){
-            this = new SkipList;
             for(auto it = first; it != last; ++it){
-                push_back(*it);
+                insert(*it);
             }
         }
         SkipList(const SkipList& other) : length(other.length()), num_layers(other.num_layers) {
@@ -96,7 +95,14 @@ class SkipList{
 
         // assignment operators
         SkipList& operator=(const SkipList& other){
-            swap(other);
+            if(&other == this){
+                return *this;
+            }
+            length = other.length;
+            num_layers = other.num_layers;
+            delete head;
+            head = other.head;
+            other.head = nullptr;
             return *this;
         }
         SkipList& operator=(const SkipList&& other) {
@@ -121,7 +127,7 @@ class SkipList{
         const_iterator begin() const noexcept{ return cbegin(); }
         const_iterator cbegin() const{ return const_iterator(head);}
         iterator end() noexcept{
-            Node* cur_ptr = head->forawrd[num_layers];
+            Node* cur_ptr = head->forward[num_layers];
             while(cur_ptr){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
@@ -384,7 +390,7 @@ class SkipList{
                     update[i]->forward[i] = cur_ptr->forward[i];
                 }
                 delete cur_ptr;
-                while(num_layers > 0 && !head->forawrd[num_layers]){
+                while(num_layers > 0 && !head->forward[num_layers]){
                     --num_layers;
                 }
                 --length;
