@@ -112,7 +112,7 @@ class SkipList{
             num_layers = other.num_layers;
             delete head;
             head = other.head;
-            return *this;
+            return *this; 
         }
         SkipList& operator=(std::initializer_list<value_type> ilist){
             clear();
@@ -240,7 +240,7 @@ class SkipList{
             return std::make_pair(end(), false);
         }
         iterator insert(const_iterator pos, const value_type& value){
-            Node* cur_ptr = pos.getPtr();
+            Node* cur_ptr = pos.getConstPtr();
             if(cur_ptr->element > value){
                 cur_ptr = head;
             }
@@ -406,16 +406,16 @@ class SkipList{
         }
         void swap(SkipList& other){
             if(this != &other) {
-                std::swap(this->num_layers, other->num_layers);
-                std::swap(this->length, other->length);
-                std::swap(this->head, other->head);
+                std::swap(this->num_layers, other.num_layers);
+                std::swap(this->length, other.length);
+                std::swap(this->head, other.head);
             }
         }
 
         // lookup
         size_t count(const T& value) const{
             auto pair = equal_range(value);
-            return std::distance(pair.second - pair.first);
+            return std::distance(pair.second, pair.first);
         }
         iterator find(const T& value){
             Node* cur_ptr = head;
@@ -470,7 +470,7 @@ class SkipList{
         }
         void merge(SkipList&& other){
             for(T& elem : other){
-                insert(std::move(other));
+                insert(std::move(elem));
             }
         }
         template <class Comp>
@@ -490,7 +490,7 @@ class SkipList{
         template <class UnaryPred>
         size_t remove_if(UnaryPred p){
             for(auto it = this->begin(); auto last = this->end(); it != last){
-                if(pred(*it)){
+                if(p(*it)){
                     it = erase(it);
                 }
                 else{
@@ -503,7 +503,7 @@ class SkipList{
 
 template <class T>
 bool operator==(const SkipList<T>& lhs, const SkipList<T>& rhs){
-    if(lhs.length() != rhs.length()){return false; }
+    if(lhs.size() != rhs.size()){return false; }
     auto lhs_it = lhs.begin();
     auto rhs_it = rhs.begin();
     while(lhs_it != lhs.end()){
