@@ -242,7 +242,7 @@ TEST(SkipListTests, erasePos){
     test.insert(40);
     test.erase(test.begin());
     EXPECT_EQ(test.size(), 1);
-    EXPECT_EQ(*test.begin(), 3)
+    EXPECT_EQ(*test.begin(), 3);
 }
 
 TEST(SkipListTests, eraseRange){

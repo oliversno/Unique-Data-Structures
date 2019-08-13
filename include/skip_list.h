@@ -1,7 +1,7 @@
 #ifndef SKIP_LIST_H
 #define SKIP_LIST_H
 
-#include "BD_Iter.h"
+#include "RA_Iter.h"
 #include "Rev_Iter.h"
 #include <algorithm>
 #include <initializer_list>
@@ -56,8 +56,8 @@ class SkipList{
         typedef const value_type& const_reference;
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
-        typedef BDIterator<const value_type> iterator;
-        typedef BDIterator<const value_type> const_iterator;
+        typedef RAIterator<const value_type> iterator;
+        typedef RAIterator<const value_type> const_iterator;
         typedef RevIterator<iterator> reverse_iterator;
         typedef RevIterator<const_iterator> const_reverse_iterator;
         typedef typename std::iterator_traits<iterator>::difference_type difference_type;
@@ -327,7 +327,7 @@ class SkipList{
         template <class... Args>
         std::pair<iterator, bool> emplace(const_iterator pos, Args&&... args){
             Node* cur_ptr = pos.getPtr();
-            if(cur_ptr->element > value){
+            if(cur_ptr->element > value_type(std::forward<Args>(args) ...)){
                 cur_ptr = head;
             }
             // create an array to store changes on each layer
@@ -335,13 +335,13 @@ class SkipList{
             memset(update, 0, sizeof(Node*)*(kMAX_LAYERS+1));
             //travel down layers and advance cur_ptr until right spot is found
             for(int i = num_layers; i >= 0; --i){
-                while(cur_ptr->forward[i] && cur_ptr->forward[i]->element < value){
+                while(cur_ptr->forward[i] && cur_ptr->forward[i]->element < value_type(std::forward<Args>(args) ...)){
                     cur_ptr = cur_ptr->forward[i];
                 }
                 update[i] = cur_ptr;
             }
             cur_ptr = cur_ptr->forward[0]; // advance cur_ptr on bottom layer
-            if(!cur_ptr || cur_ptr->element < value){
+            if(!cur_ptr || cur_ptr->element < value_type(std::forward<Args>(args) ...)){
                 unsigned int rand_layer = random_level();
                 if(rand_layer > num_layers){
                     for(int i = num_layers+1; i < rand_layer+1; ++i){
@@ -350,7 +350,7 @@ class SkipList{
                     num_layers = rand_layer;
                 }
                 Node* new_node = new Node;
-                new_node->element = std::move(value_type(std::forward<Args>(args) ...));;
+                new_node->element = std::move(value_type(std::forward<Args>(args) ...));
                 for(int i = 0; i <= rand_layer; ++i){
                     new_node->forward[i] = update[i]->forward[i];
                     update[i]->forward[i] = new_node;
@@ -363,7 +363,7 @@ class SkipList{
         }
         template <class... Args>
         iterator emplace(const_iterator pos, Args&&... args){
-            return empalce(pos, args).first;
+            return empalce(pos, args...).first;
         }
         size_t erase(const value_type& value){
             Node* cur_ptr = head;

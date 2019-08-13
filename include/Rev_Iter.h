@@ -1,9 +1,9 @@
 #ifndef REV_ITER_H
 #define REV_ITER_H
-#include "BD_Iter.h"
+#include "RA_Iter.h"
 
 template <typename T>
-class RevIterator : public BDIterator<T>
+class RevIterator : public RAIterator<T>
 {
 protected:
     T* m_ptr;
