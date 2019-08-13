@@ -9,7 +9,6 @@ protected:
     T* m_ptr;
 public:
     RevIterator(T* ptr = nullptr) : m_ptr(ptr){}
-    RevIterator(const RevIterator<T>& iter) = default;
     ~RevIterator(){}
 
     RevIterator<T>& operator=(const RevIterator<T>& iter) = default;

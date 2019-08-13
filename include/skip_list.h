@@ -72,11 +72,11 @@ class SkipList{
                 insert(*it);
             }
         }
-        SkipList(const SkipList& other) : length(other.length()), num_layers(other.num_layers) {
+        SkipList(const SkipList& other) : length(other.length), num_layers(other.num_layers) {
             head = new Node;
             *head = *other.head;
         }
-        SkipList(const SkipList&& other) : length(other.length()), num_layers(other.num_layers()) {
+        SkipList(const SkipList&& other) : length(other.length), num_layers(other.num_layers) {
             head = other.head;
             other.head = nullptr;
         }
@@ -102,7 +102,6 @@ class SkipList{
             num_layers = other.num_layers;
             delete head;
             head = other.head;
-            other.head = nullptr;
             return *this;
         }
         SkipList& operator=(const SkipList&& other) {
@@ -113,7 +112,6 @@ class SkipList{
             num_layers = other.num_layers;
             delete head;
             head = other.head;
-            other.head = nullptr;
             return *this;
         }
         SkipList& operator=(std::initializer_list<value_type> ilist){
@@ -135,7 +133,7 @@ class SkipList{
         }
         const_iterator end() const noexcept{ return cend(); }
         const_iterator cend() const noexcept{
-            Node* cur_ptr = head->forward[num_layers];
+            const Node* cur_ptr = head->forward[num_layers];
             while(cur_ptr){
                 cur_ptr = cur_ptr->forward[num_layers];
             }
@@ -231,7 +229,7 @@ class SkipList{
                     num_layers = rand_layer;
                 }
                 Node* new_node = new Node;
-                &new_node->element = &value;
+                new_node->element = std::move(value);
                 for(int i = 0; i <= rand_layer; ++i){
                     new_node->forward[i] = update[i]->forward[i];
                     update[i]->forward[i] = new_node;
@@ -301,7 +299,7 @@ class SkipList{
                     num_layers = rand_layer;
                 }
                 Node* new_node = new Node;
-                &new_node->element = &value;
+                new_node->element = std::move(value);
                 for(int i = 0; i <= rand_layer; ++i){
                     new_node->forward[i] = update[i]->forward[i];
                     update[i]->forward[i] = new_node;
@@ -490,7 +488,7 @@ class SkipList{
             }
         }
         template <class UnaryPred>
-        void remove_if(UnaryPred p){
+        size_t remove_if(UnaryPred p){
             for(auto it = this->begin(); auto last = this->end(); it != last){
                 if(pred(*it)){
                     it = erase(it);
@@ -499,10 +497,6 @@ class SkipList{
                     ++it;
                 }
             }
-        }
-        template <class UnaryPred>
-        size_t remove_if(UnaryPred p){
-            remove_if(p);
             return length;
         }
 };

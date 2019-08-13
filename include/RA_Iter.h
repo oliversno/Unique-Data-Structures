@@ -13,7 +13,6 @@ protected:
     T* m_ptr;
 public:
     RAIterator(T* ptr = nullptr) : m_ptr(ptr){}
-    RAIterator(const RAIterator<T>& iter) = default;
     ~RAIterator(){}
 
     RAIterator<T>& operator=(const RAIterator<T>& iter) = default;
