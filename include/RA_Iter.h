@@ -5,7 +5,7 @@
 template <typename T>
 class RAIterator : public std::iterator<std::random_access_iterator_tag,
                                         T,
-                                        ptrdiff_t,
+                                        int,
                                         T*,
                                         T&>
 {
@@ -26,27 +26,27 @@ public:
     }
     bool operator==(const RAIterator<T>& rhs) const{ return m_ptr == rhs.getConstPtr(); }
     bool operator!=(const RAIterator<T>& rhs) const{ return m_ptr != rhs.getConstPtr(); }
-    RAIterator<T>& operator+=(const ptrdiff_t& mov){ m_ptr += mov; return *this; }
-    RAIterator<T>& operator-=(const ptrdiff_t& mov){ m_ptr -= mov; return *this; }
+    RAIterator<T>& operator+=(const int& mov){ m_ptr += mov; return *this; }
+    RAIterator<T>& operator-=(const int& mov){ m_ptr -= mov; return *this; }
     RAIterator<T>& operator++(){ ++m_ptr; return *this; }
     RAIterator<T>& operator--(){ --m_ptr; return *this; }
-    RAIterator<T>& operator++(ptrdiff_t){ auto temp{*this}; ++m_ptr; return temp; }
-    RAIterator<T>& operator--(ptrdiff_t){ auto temp{*this}; --m_ptr; return temp; }
-    RAIterator<T>& operator+(const ptrdiff_t& mov){
+    RAIterator<T>& operator++(int){ auto temp{*this}; ++m_ptr; return temp; }
+    RAIterator<T>& operator--(int){ auto temp{*this}; --m_ptr; return temp; }
+    RAIterator<T>& operator+(const int& mov){
         auto old_ptr = m_ptr;
         m_ptr += mov;
         auto temp{*this};
         m_ptr = old_ptr;
         return temp;    
     }
-    RAIterator<T>& operator-(const ptrdiff_t& mov){
+    RAIterator<T>& operator-(const int& mov){
         auto old_ptr = m_ptr;
         m_ptr -= mov;
         auto temp{*this};
         m_ptr = old_ptr;
         return temp;    
     }
-    ptrdiff_t operator-(const RAIterator<T>& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
+    int operator-(const RAIterator<T>& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
     T& operator*(){ return *m_ptr; }
     const T& operator*() const{ return *m_ptr; }
     T* operator->(){ return m_ptr; }
