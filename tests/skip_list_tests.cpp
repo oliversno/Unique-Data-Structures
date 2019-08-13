@@ -382,7 +382,7 @@ TEST(SkipListTests, remove){
 
 TEST(SkipListTests, remove_if){
     SkipList<int> test = {1,2,3,4};
-    bool is_even = [](int i){ return i%2; }
+    auto is_even = [](int i){ return (i%2 == 0); };
     EXPECT_EQ(test.remove_if(is_even), 2);
 }
 
