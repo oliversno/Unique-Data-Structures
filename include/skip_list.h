@@ -30,7 +30,9 @@ class SkipList{
         void delete_node(Node* node){
             if(!node){
                 delete_node(node->forward[0]);
-                delete[] node->forward;
+                for(int i = 0; i < num_layers; ++i){
+                    delete node->forward[i];
+                }
                 for(int i = 0; i < num_layers; ++i){
                     node->forward[i] = nullptr;
                 }
