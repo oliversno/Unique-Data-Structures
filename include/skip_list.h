@@ -367,10 +367,6 @@ class SkipList{
             return std::make_pair(this->end(), false);
 
         }
-        template <class... Args>
-        iterator emplace(const_iterator pos, Args&&... args){
-            return empalce(pos, args...).first;
-        }
         size_t erase(const value_type& value){
             Node* cur_ptr = head;
             // create an array to store changes on each layer
@@ -505,7 +501,7 @@ class SkipList{
 
 template <class T>
 bool operator==(const SkipList<T>& lhs, const SkipList<T>& rhs){
-    if(lhs.size() != rhs.size()){return false; }
+    if(lhs.size() != rhs.size()){ return false; }
     auto lhs_it = lhs.begin();
     auto rhs_it = rhs.begin();
     while(lhs_it != lhs.end()){
