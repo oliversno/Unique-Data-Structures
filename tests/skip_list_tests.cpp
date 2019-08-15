@@ -23,7 +23,7 @@ TEST(SkipListTests, CopyCtor){
 TEST(SkipListTests, MoveCtor){
     SkipList<int> one{5, 7};
     SkipList<int> two;
-    SkipList three{two=one};
+    SkipList<int> three{two=one};
     EXPECT_EQ(three, one);
 }
 
