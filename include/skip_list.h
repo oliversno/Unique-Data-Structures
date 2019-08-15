@@ -1,12 +1,15 @@
 #ifndef SKIP_LIST_H
 #define SKIP_LIST_H
 
-#include "RA_Iter.h"
-#include "Rev_Iter.h"
 #include <algorithm>
 #include <initializer_list>
 #include <cmath>
 #include <random>
+#include <cstddef> // ptrdiff_t
+#include <type_traits> // remove_cv
+#include <iterator>
+
+
 
 template <class T,
           class Compare = std::less<T>,
@@ -21,6 +24,59 @@ class SkipList{
         struct Node{
             T element;
             Node* forward[kMAX_LAYERS];
+        };
+        template <class UnquaifiedT = std::remove_cv_t<T> >
+        class RAIterator : public std::iterator<std::random_access_iterator_tag,
+                                                UnquaifiedT,
+                                                std::ptrdiff_t,
+                                                T*,
+                                                T&>
+        {
+        protected:
+            Node* m_ptr;
+        public:
+            RAIterator(Node* ptr = nullptr) : m_ptr(ptr) {}
+            ~RAIterator(){}
+
+            RAIterator<T>& operator=(const RAIterator<T>& iter) = default;
+
+            operator bool() const{
+                if(m_ptr)
+                    return true;
+                return false;
+            }
+            bool operator==(const RAIterator<T>& rhs) const{ return m_ptr == rhs.getConstPtr(); }
+            bool operator!=(const RAIterator<T>& rhs) const{ return m_ptr != rhs.getConstPtr(); }
+            RAIterator<T>& operator+=(const int& mov){ m_ptr += mov; return *this; }
+            RAIterator<T>& operator-=(const int& mov){ m_ptr -= mov; return *this; }
+            RAIterator<T>& operator++(){ ++m_ptr; return *this; }
+            RAIterator<T>& operator--(){ --m_ptr; return *this; }
+            RAIterator<T>& operator++(int){ auto temp{*this}; ++m_ptr; return temp; }
+            RAIterator<T>& operator--(int){ auto temp{*this}; --m_ptr; return temp; }
+            RAIterator<T>& operator+(const int& mov){
+                auto old_ptr = m_ptr;
+                m_ptr += mov;
+                auto temp{*this};
+                m_ptr = old_ptr;
+                return temp;    
+            }
+            RAIterator<T>& operator-(const int& mov){
+                auto old_ptr = m_ptr;
+                m_ptr -= mov;
+                auto temp{*this};
+                m_ptr = old_ptr;
+                return temp;    
+            }
+            int operator-(const RAIterator<T>& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
+            T& operator*(){ return m_ptr->element; }
+            const T& operator*() const{ return m_ptr->element; }
+            T* operator->(){ return &m_ptr->element; }
+            T* getPtr(){ return &m_ptr->element; }
+            const T* getConstPtr() const{ return &m_ptr->element; }
+            void swap(RAIterator<T>& other) noexcept
+            {
+                std::swap(m_ptr, other.m_ptr);
+            }
         };
         Node* head;
         Node* make_node(const unsigned int level, const T& value) const{
@@ -58,8 +114,8 @@ class SkipList{
         typedef const value_type& const_reference;
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
-        typedef RAIterator<const SkipList<value_type>::Node> iterator;
-        typedef RAIterator<const SkipList<value_type>::Node> const_iterator;
+        typedef RAIterator<const value_type> iterator;
+        typedef RAIterator<const value_type> const_iterator;
         typedef RevIterator<iterator> reverse_iterator;
         typedef RevIterator<const_iterator> const_reverse_iterator;
         typedef typename std::iterator_traits<iterator>::difference_type difference_type;
