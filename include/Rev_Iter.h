@@ -11,7 +11,6 @@ public:
     RevIterator(T* ptr = nullptr) : m_ptr(ptr){}
     ~RevIterator(){}
 
-    RevIterator<T>& operator=(const RevIterator<T>& iter) = default;
     RevIterator<T>& operator=(T* ptr){ m_ptr = ptr; return *this; }
 
     operator bool() const{

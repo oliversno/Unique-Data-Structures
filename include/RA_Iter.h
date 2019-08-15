@@ -1,22 +1,23 @@
 #ifndef RA_ITER_H
 #define RA_ITER_H
+#include <cstddef> // ptrdiff_t
+#include <type_traits> // remove_cv
 #include <iterator>
 
-template <typename T>
+template < class T, class UnquaifiedT = std::remove_cv_t<T> >
 class RAIterator : public std::iterator<std::random_access_iterator_tag,
-                                        T,
-                                        int,
+                                        UnquaifiedT,
+                                        std::ptrdiff_t,
                                         T*,
                                         T&>
 {
 protected:
-    T* m_ptr;
+    UnquaifiedT* m_ptr;
 public:
-    RAIterator(T* ptr = nullptr) : m_ptr(ptr){}
+    RAIterator(UnquaifiedT* ptr = nullptr) : m_ptr(ptr) {}
     ~RAIterator(){}
 
     RAIterator<T>& operator=(const RAIterator<T>& iter) = default;
-    RAIterator<T>& operator=(T* ptr){ m_ptr = ptr; return *this; }
 
     operator bool() const{
         if(m_ptr)
@@ -51,6 +52,10 @@ public:
     T* operator->(){ return m_ptr; }
     T* getPtr(){ return m_ptr; }
     const T* getConstPtr() const{ return m_ptr; }
+    void swap(RAIterator<T>& other) noexcept
+    {
+        std::swap(m_ptr, other.m_ptr);
+    }
 };
 
 #endif

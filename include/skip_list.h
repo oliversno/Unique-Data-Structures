@@ -58,8 +58,8 @@ class SkipList{
         typedef const value_type& const_reference;
         typedef typename std::allocator_traits<allocator_type>::pointer pointer;
         typedef typename std::allocator_traits<allocator_type>::const_pointer const_pointer;
-        typedef RAIterator<const value_type> iterator;
-        typedef RAIterator<const value_type> const_iterator;
+        typedef RAIterator<const SkipList<value_type>::Node> iterator;
+        typedef RAIterator<const SkipList<value_type>::Node> const_iterator;
         typedef RevIterator<iterator> reverse_iterator;
         typedef RevIterator<const_iterator> const_reverse_iterator;
         typedef typename std::iterator_traits<iterator>::difference_type difference_type;
