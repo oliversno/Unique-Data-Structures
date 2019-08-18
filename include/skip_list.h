@@ -68,7 +68,7 @@ class SkipList{
                 m_ptr = old_ptr;
                 return temp;    
             }
-            int operator-(const RAIterator& rhs) { return std::distance(rhs.getPtr(), this->getPtr()); }
+            int operator-(const RAIterator& rhs) { return std::distance(rhs.getConstPtr(), this->getConstPtr()); }
             T& operator*(){ return m_ptr->element; }
             const T& operator*() const{ return m_ptr->element; }
             T* operator->(){ return &m_ptr->element; }
@@ -541,8 +541,8 @@ class SkipList{
             return find(value) != this->end();
         }
         std::pair<iterator, iterator> equal_range(const T& value){
-            auto start_it = find(value);
-            Node* cur_ptr = start_it;
+            iterator start_it = find(value);
+            Node* cur_ptr = start_it.getPtr();
             for(int i = num_layers; i >= 0; --i){
                 while(cur_ptr->forward[i] && cur_ptr->element <= value){
                     cur_ptr = cur_ptr->forward[i];
