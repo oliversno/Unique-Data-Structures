@@ -215,14 +215,6 @@ TEST(SkipListTests, emplace){
     EXPECT_EQ(res, vec);
 }
 
-TEST(SkipListTests, emplaceConst){
-    const SkipList<std::vector<char>> test;
-    test.emplace(test.begin(), 3, 'c');
-    std::vector<char> vec = *test.cbegin();
-    std::vector<char> res = {'c','c','c'};
-    EXPECT_EQ(res, vec);
-}
-
 TEST(SkipListTests, eraseValue){
     SkipList<int> test;
     test.insert(3);
