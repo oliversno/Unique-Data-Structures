@@ -219,9 +219,7 @@ class SkipList{
             return *this; 
         }
         SkipList& operator=(std::initializer_list<value_type> ilist){
-            clear();
-            this = new SkipList(ilist);
-            return *this;
+            return this->operator=(SkipList(ilist));
         }
 
         // iterators
