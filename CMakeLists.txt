@@ -30,8 +30,8 @@ if(BUILD_TESTS)
     
     enable_testing()
 
-    # add_executable(test_bktree test_bktree.cpp bktree.cpp)
-    # target_link_libraries(test_bktree gtest gtest_main)
+    add_executable(test_skiplist tests/skip_list_tests.cpp include/skip_list.h)
+    target_link_libraries(test_skiplist gtest gtest_main)
 
-    # add_test(TestDict test_dict)
+    add_test(TestSkipList test_skiplist)
 endif()
